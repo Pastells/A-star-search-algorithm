@@ -3,17 +3,7 @@
 
 /* Shared definitions */
 
-
-typedef struct{
-    unsigned long id;  //node identification
-    char *name;
-    double lat, lon;  // node position
-    unsigned short nsucc; //number of node successors
-    unsigned long *successors;
-}node;
-
-
-typedef struct node2{
+typedef struct node2 {
 	unsigned long id;
 	double lat, lon;
 	unsigned short nsucc;
@@ -25,7 +15,7 @@ typedef struct node2{
 }node_complete;
 
 
-typedef struct{
+typedef struct {
 	node_complete * start, *end;
 	unsigned long nelems; // number of elements on list
 } ourlist; // open list structure
@@ -41,7 +31,7 @@ extern double heuristic_function(node_complete *init, node_complete *prev, int m
 
 
  // returns the node index from the node id
-extern long BinarySearch(unsigned long key);
+extern unsigned long BinarySearch(unsigned long key, node_complete *list, unsigned long list_len);
 
 /************************************************************************/
 /*                   Utility functions for linked list                  */
@@ -56,6 +46,6 @@ extern void Add_to_Open(ourlist *list, node_complete *succesor);
 extern int A_star (unsigned int source, unsigned int goal, int method);
 
 
-extern void reading_from_file();
+extern void Reading_csv(char *binary_file);
 
 #endif

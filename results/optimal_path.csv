@@ -1,7 +1,7 @@
-# Path from GOAL to SOURCE
-# Time elapsed by A* Algorithm 7.926431s 
-# Time elapsed reading binary file 0.696291s
-# Total time elapsed 9.630616s
+# path from goal to source
+# Time elapsed by A* Algorithm 7.863911s 
+# Time elapsed reading binary file 0.586811s
+# Total time elapsed 9.426856s
 # Iteration, Node Id, Distance, latitude, longitude
     ,  195977239, 959883.54, 37.3860989, -5.9917423
    1,  710632992, 959874.07, 37.3861635, -5.9918119
