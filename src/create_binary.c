@@ -22,7 +22,7 @@ typedef struct{
 }box;
 
 
-// global declarations (no m'agraden gaire)
+// global declarations
 unsigned long nnodes = 23895681UL;
 node *nodes;
 box *auxiliar = NULL;
@@ -44,25 +44,19 @@ int field_type(char *line) {
 
 // Returns node index from the node id
 unsigned long BinarySearch(unsigned long key, node *list, unsigned long list_len) {
-    unsigned long start=0UL, middle, after_end=list_len;
-    unsigned long try;
+    unsigned long start=0UL, middle, after_end=list_len, try;
 
     while(after_end > start) {
         middle = start + ((after_end-start - 1) >> 1);
         try = list[middle].id;
-        if (key == try) return middle;
-        else if (key > try) start = middle + 1;
-        else after_end = middle;
+        if (key == try)
+            return middle;
+        else if (key > try)
+            start = middle + 1;
+        else
+            after_end = middle;
     }
     return ULONG_MAX; // if it fails set to ULONG_MAX
-}
-
-
-// No es fa servir, guardar a algun lloc i borrar-lo d'aquí
-unsigned long LinearSearch(unsigned long key, node *list, unsigned long list_len) {
-    register unsigned long s;
-    for(s=0; s<list_len; s++) {if (key == list[s].id) return s;}
-    return ULONG_MAX;
 }
 
 
