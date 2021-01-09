@@ -1,37 +1,43 @@
-"""Module to plot A* solution"""
-import argparse
+"""Module to plot A* solution in a map
+Google maps solution from:
+https://webapps.stackexchange.com/questions/34159/how-to-convert-google-map-route-into-array-of-coordinates
+Coordinates are first longitude then latitude
+"""
 import gmplot
 
-parser = argparse.ArgumentParser(description="A* visualization")
-parser.add_argument(
-    "-path", type=str, default="results/optimal_path.csv", help="File with optimal path"
-)
 
-args = parser.parse_args()
+def read_path(path):
+    """Read coordinates from input_file"""
+    latitude, longitude = [], []
+    with open(path, "r") as file:
+        for line in file:
+            if line.startswith("#"):
+                continue
+            fields = line.split(",")
+            for field in fields:
+                field.strip()
+            longitude.append(float(fields[0]))
+            latitude.append(float(fields[1]))
+    return latitude, longitude
 
 
-# Place map in Albacete
-gmap = gmplot.GoogleMapPlotter(38.993464, -1.859774, 7)
+PATH = "results/optimal_path.csv"
+MAPS_PATH = "data/doc.kml"
+
+# output file name
+OUTPUT_FILE = PATH[:-3] + "html"
+
+lat_maps, lon_maps = read_path(MAPS_PATH)  # data from google maps UI
+lat_sol, lon_sol = read_path(PATH)
 
 
-# Define an output file name according to input file name
-output_file = args.path[:-3] + "html"
+# map origin
+gmap = gmplot.GoogleMapPlotter(38.4077013, -0.5015955, 7)
 
-# Read coordinates from input_file
-latitude = []
-longitude = []
-with open(args.path, "r") as f:
-    for line in f:
-        if line.startswith("#"):
-            continue
-        fields = line.split(",")
-        for field in fields:
-            field.strip()
-        latitude.append(float(fields[3]))
-        longitude.append(float(fields[4]))
 
-# Add route to map
-gmap.plot(latitude, longitude, "cornflowerblue", edge_width=6)
+# Plot path
+gmap.plot(lat_maps, lon_maps, "cornflowerblue", edge_width=6)
+gmap.plot(lat_sol, lon_sol, "orange", edge_width=6)
 
-# Save map
-gmap.draw(output_file)
+# Save path map
+gmap.draw(OUTPUT_FILE)

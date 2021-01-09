@@ -58,6 +58,7 @@ unsigned long BinarySearch(unsigned long key, node *list, unsigned long list_len
 }
 
 
+// No es fa servir, guardar a algun lloc i borrar-lo d'aquí
 unsigned long LinearSearch(unsigned long key, node *list, unsigned long list_len) {
     register unsigned long s;
     for(s=0; s<list_len; s++) {if (key == list[s].id) return s;}

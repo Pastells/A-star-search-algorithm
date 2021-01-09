@@ -5,18 +5,18 @@
 
 typedef struct node2 {
 	unsigned long id;
-	double lat, lon;
+	double lon, lat;
 	unsigned short nsucc;
 	unsigned long *successors;
 	struct node2 *prev, *next,*parent; // next and prev for the open list structure. parent to know the final path
 	char list; // 0: nothing, 1: open, 2: closed
-	double heuristic; // heuristic distance+ g distance
-	double g; // g distance: from source to this node
-}node_complete;
+	double heuristic; // heuristic distance + g distance
+	double g; // g distance from source
+}node_dist;
 
 
 typedef struct {
-	node_complete * start, *end;
+	node_dist * start, *end;
 	unsigned long nelems; // number of elements on list
 } ourlist; // open list structure
 
@@ -27,19 +27,19 @@ typedef struct {
 
 extern void ListInicialization ( ourlist *x);
 
-extern double heuristic_function(node_complete *init, node_complete *prev, int method);
+extern double heuristic_function(node_dist *init, node_dist *prev, int method);
 
 
  // returns the node index from the node id
-extern unsigned long BinarySearch(unsigned long key, node_complete *list, unsigned long list_len);
+extern unsigned long BinarySearch(unsigned long key, node_dist *list, unsigned long list_len);
 
 /************************************************************************/
 /*                   Utility functions for linked list                  */
 /************************************************************************/
-extern void DeleteNode(ourlist *list, node_complete *target);
-extern void InsertNodeAfter(ourlist *list, node_complete *target , node_complete *a_insertar);
-extern void InsertNodeBefore(ourlist *list, node_complete *target , node_complete *a_insertar);
-extern void Add_to_Open(ourlist *list, node_complete *succesor);
+extern void DeleteNode(ourlist *list, node_dist *target);
+extern void InsertNodeAfter(ourlist *list, node_dist *target , node_dist *a_insertar);
+extern void InsertNodeBefore(ourlist *list, node_dist *target , node_dist *a_insertar);
+extern void Add_to_Open(ourlist *list, node_dist *succesor);
 /*****************************************************************/
 
 
