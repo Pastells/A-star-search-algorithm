@@ -1,4 +1,4 @@
-/* Function ExitErro defined in utils.c used in all programs
+/* Function ExitError defined in utils.c used in all programs
    node and node_dist stucts */
 
 #ifndef UTILS_H_INCLUDED

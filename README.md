@@ -4,6 +4,8 @@ Works for the csv files given in http://mat.uab.cat/~alseda/MasterOpt
 
 ## Execution:
 
++ Place input csv in data folder
+
 + Compile with ```./compile.sh```
 
 + ```./create_binary``` to create the binary file
@@ -21,7 +23,7 @@ the path is computed to go from node 240949599 to 195977239
 and the result is stored in ```results/optimal_path.csv```
 These can be changed with ```argv[2-5]```. An example of a correct execution may be:
 
-\t ```./a_star 2 771979683 429854583 data/binary.bin results/girona_lleida.csv```
+```./a_star 2 771979683 429854583 data/binary.bin results/girona_lleida.csv```
 
 ## Structure
 
