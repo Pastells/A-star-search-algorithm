@@ -6,7 +6,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-#include "utils.h"
+#include "utils.h" // ExitError, node and node_dist structs
 #include "a_star_aux.h"
 #define R_earth 6.378e6 // Earth radius (m)
 #define ULONG_MAX 0xFFFFFFFFUL
@@ -17,20 +17,6 @@
 unsigned long nnodes = 23895681UL;
 node *nodes;
 node_dist *node_dist_var;
-
-/* Initialize node in node_dist_var
-   Uses nodes and node_dist_var as global variables */
-void NodeInit(unsigned int i) {
-    node_dist_var[i].lon = nodes[i].lon;
-    node_dist_var[i].lat = nodes[i].lat;
-    node_dist_var[i].nsucc = nodes[i].nsucc;
-    node_dist_var[i].successors = nodes[i].successors;
-    node_dist_var[i].g = INFTY;
-    node_dist_var[i].which_list = 0;
-    node_dist_var[i].heuristic = INFTY;
-    node_dist_var[i].id = nodes[i].id;
-    node_dist_var[i].parent = NULL;
-}
 
 
 /* Different heuristic functions to choose from */
@@ -48,8 +34,8 @@ double heuristic_function(node_dist *init, node_dist *prev, int method) {
 
     // 1. Haversine formula
     if (method == 1) {
-        double a = sin(lat_dif/2)*sin(lat_dif/2) + cos(phi1)*cos(phi2)*sin(long_dif/2)*sin(long_dif/2);
-        double c = 2*atan2(sqrt(a), sqrt(1-a));
+        double a = sin(lat_dif/2.)*sin(lat_dif/2.) + cos(phi1)*cos(phi2)*sin(long_dif/2.)*sin(long_dif/2.);
+        double c = 2.*atan2(sqrt(a), sqrt(1.-a));
         return c*R_earth;
     }
 
@@ -60,7 +46,7 @@ double heuristic_function(node_dist *init, node_dist *prev, int method) {
 
     // 3. Equirectangular approximation
     else {
-        double x = long_dif * cos( (phi1+phi2)/2 );
+        double x = long_dif * cos( (phi1+phi2)/2. );
         return R_earth*sqrt(x*x+lat_dif*lat_dif);
     }
 
@@ -95,35 +81,54 @@ unsigned long BinarySearch(unsigned long key, node_dist *list, unsigned long lis
 
 void Reading_csv(char *binary_file) {
     unsigned int i;
-    static unsigned long *allsuccesors;
-    unsigned long ntotnsucc=0UL;
+    static unsigned long *succesors;
+    unsigned long nsuccdim_tot=0UL;
     FILE *fin;
 
     fin=fopen(binary_file, "rb");
 
     // checks for possible errors
     if ( (fread(&nnodes, sizeof(unsigned long), 1, fin) +
-          fread(&ntotnsucc, sizeof(unsigned long), 1, fin)) !=2 )
+          fread(&nsuccdim_tot, sizeof(unsigned long), 1, fin)) !=2 )
         ExitError("reading the header of binary file", 101);
 
     if ((nodes=malloc(sizeof(node)*nnodes)) == NULL)
         ExitError("allocating memory for nodes vector", 102);
 
-    if((allsuccesors=malloc(sizeof(unsigned long)*ntotnsucc))==NULL)
+    if((succesors=malloc(sizeof(unsigned long)*nsuccdim_tot))==NULL)
         ExitError("allocating memory for edges vector", 103);
 
     if (fread(nodes, sizeof(node), nnodes, fin)!=nnodes)
         ExitError("reading nodes from binary file", 104);
 
-    if (fread(allsuccesors, sizeof(unsigned long), ntotnsucc, fin)!=ntotnsucc)
+    if (fread(succesors, sizeof(unsigned long), nsuccdim_tot, fin) != nsuccdim_tot)
         ExitError("reading successors from binary file", 105);
 
     fclose(fin);
 
-    for (i=0;i<nnodes; i++) if (nodes[i].nsucc) {
-        nodes[i].successors=allsuccesors;
-        allsuccesors+=nodes[i].nsucc;
+    for (i=0;i<nnodes; i++) if (nodes[i].nsuccdim) {
+        nodes[i].successors = succesors;
+        succesors += nodes[i].nsuccdim;
     }
+}
+
+
+/***********************************************************/
+/*                   Fill node_dist_var                    */
+/***********************************************************/
+
+/* Initialize node in node_dist_var
+   Uses nodes and node_dist_var as global variables */
+void NodeInit(unsigned int i) {
+    node_dist_var[i].lon = nodes[i].lon;
+    node_dist_var[i].lat = nodes[i].lat;
+    node_dist_var[i].nsuccdim = nodes[i].nsuccdim;
+    node_dist_var[i].successors = nodes[i].successors;
+    node_dist_var[i].g = INFTY;
+    node_dist_var[i].which_list = 0;
+    node_dist_var[i].heuristic = INFTY;
+    node_dist_var[i].id = nodes[i].id;
+    node_dist_var[i].parent = NULL;
 }
 
 
@@ -260,7 +265,7 @@ int A_star (unsigned int node_start, unsigned int node_goal, int method) {
             return 0;
 
         /* for all successors of current  node */
-        for (i = 0; i < (current->nsucc); i++) {
+        for (i = 0; i < (current->nsuccdim); i++) {
             succesor = &node_dist_var[*(current->successors+i)];
 
             /* set successor cost to g(current) + h(successor, current) */

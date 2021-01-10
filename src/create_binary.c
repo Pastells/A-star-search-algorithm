@@ -7,7 +7,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/types.h>
-#include "utils.h"
+#include "utils.h" // ExitError, node and node_dist structs
 #define ULONG_MAX 0xFFFFFFFFUL
 
 /***********************************************************/
@@ -25,7 +25,7 @@ typedef struct{
 // global declarations
 unsigned long nnodes = 23895681UL;
 node *nodes;
-box *auxiliar = NULL;
+box *aux_box = NULL;
 short size = 0; //size of the box
 
 
@@ -45,7 +45,6 @@ int field_type(char *line) {
 // Returns node index from the node id
 unsigned long BinarySearch(unsigned long key, node *list, unsigned long list_len) {
     unsigned long start=0UL, middle, after_end=list_len, try;
-
     while(after_end > start) {
         middle = start + ((after_end-start - 1) >> 1);
         try = list[middle].id;
@@ -60,46 +59,54 @@ unsigned long BinarySearch(unsigned long key, node *list, unsigned long list_len
 }
 
 
-/* If *temp node is registered (it appears as node) is stored in auxiliar, a box-type variable.
-*  if node is not registered, we will skip it and link the previous to this to next to this */
-void ConnectingNodes(char *temp) {
-    long index = BinarySearch(atol(temp),nodes,nnodes);
-    if (index == ULONG_MAX) return ;
 
+void LinkNodes(char *node_temp) {
+    long index;
+
+    /* If node_temp is not registered, skip. Previous and next nodes will be connected */
+    if ((index = BinarySearch(atol(node_temp), nodes, nnodes) == ULONG_MAX))
+        return ;
+
+    /* If *node_temp is registered, store in aux_box */
     // Size is a global variable
     size++;
-    auxiliar = realloc(auxiliar,sizeof(box)*(size));
-    auxiliar[size-1].id = atol(temp);
-    auxiliar[size-1].index = index;
+    aux_box = realloc(aux_box, sizeof(box)*(size));
+    aux_box[size-1].index = index;
+    aux_box[size-1].id = atol(node_temp);
 }
 
 
-// It connects the differents nodes in the box variable auxiliar.
-void ConnectingSuccesors(int oneway) {
+// It connects the differents nodes in the box variable aux_box.
+void LinkSuccesors(int oneway) {
     short i;
 
     // Size is a global variable
     for(i=0; i<size-1; i++) {
-        nodes[auxiliar[i].index].nsucc+=1;
-        nodes[auxiliar[i].index].successors = realloc(nodes[auxiliar[i].index].successors,sizeof(unsigned long)*
-                nodes[auxiliar[i].index].nsucc);
-        nodes[auxiliar[i].index].successors[nodes[auxiliar[i].index].nsucc-1] = auxiliar[i+1].index;
+        nodes[aux_box[i].index].nsuccdim+=1;
+        nodes[aux_box[i].index].successors = realloc(nodes[aux_box[i].index].successors,sizeof(unsigned long)*
+                nodes[aux_box[i].index].nsuccdim);
+        nodes[aux_box[i].index].successors[nodes[aux_box[i].index].nsuccdim-1] = aux_box[i+1].index;
 
         if (oneway == 0) {
-            nodes[auxiliar[i+1].index].nsucc++;
-            nodes[auxiliar[i+1].index].successors = realloc(nodes[auxiliar[i+1].index].successors,sizeof(unsigned long)*
-                    nodes[auxiliar[i+1].index].nsucc);
-            nodes[auxiliar[i+1].index].successors[nodes[auxiliar[i+1].index].nsucc-1] = auxiliar[i].index;
+            nodes[aux_box[i+1].index].nsuccdim++;
+            nodes[aux_box[i+1].index].successors = realloc(nodes[aux_box[i+1].index].successors,sizeof(unsigned long)*
+                    nodes[aux_box[i+1].index].nsuccdim);
+            nodes[aux_box[i+1].index].successors[nodes[aux_box[i+1].index].nsuccdim-1] = aux_box[i].index;
         }
     }
 }
 
 
-// fill id, longitude and latitude for node z
-void fnode(int counter, char *temp, unsigned int z) {
-    if(counter == 1) 		nodes[z].id  = atol(temp);
-    else if (counter == 9)	nodes[z].lat = atof(temp);
-    else if (counter == 10)	nodes[z].lon = atof(temp);
+// fill id, longitude and latitude for node i
+void FillNode(int column, char *node_temp, unsigned int i) {
+    if(column == 1)
+        nodes[i].id  = atol(node_temp);
+    else if (column == 9)
+        nodes[i].lat = atof(node_temp);
+    else if (column == 10)
+        nodes[i].lon = atof(node_temp);
+
+    /* else pass */
 }
 
 
@@ -107,51 +114,53 @@ void fnode(int counter, char *temp, unsigned int z) {
 /*                  Reading and Writing                    */
 /***********************************************************/
 
+/* Read csv file with specific format */
 void Reading_csv(char *data_file) {
-    int field=0, counter = 0;
+    int field = 0, column = 0;
     unsigned short oneway = 0;
-    unsigned int z = 0; // cardinal
+    unsigned int i = 0;
     FILE *fin;
-
     char *line;
     size_t len = 0;
     ssize_t read;
-    char *temp;
+    char *node_temp;
 
     if ((fin=fopen(data_file,"r")) == NULL)
             ExitError("The data file does not exist or cannot be opened", 1);
 
+    /* Read line by line as a string */
     while( (read = getline(&line, &len, fin)) != -1 ) {
+
         // strsep (tokenizer) replaces | for 0's, "destroying" the line
-        while( (temp = strsep(&line,"|")) != NULL ) {
-            if (counter == 0) {
-                field = field_type(temp);
+        while( (node_temp = strsep(&line,"|")) != NULL ) {
+            if (column == 0) {
+                field = field_type(node_temp);
                 if (field != -1) {
                     // Size is a global variable
                     if(size > 1)
-                        ConnectingSuccesors(oneway);
-                    free(auxiliar);
-                    auxiliar = NULL;
+                        LinkSuccesors(oneway);
+                    free(aux_box);
+                    aux_box = NULL;
                     size = 0;
                     oneway = 0;
                 }
             }
 
             if (field == 0 )
-                fnode(counter, temp, z);
+                FillNode(column, node_temp, i);
 
-            else if(field == 1 ) {
-                if (counter == 7 && strcmp(temp,"oneway") == 0)
+            else if(field == 1) {
+                if (column == 7 && strcmp(node_temp,"oneway") == 0)
                     oneway=1;
-                if (counter>=9)
-                    ConnectingNodes(temp);
+                if (column>=9)
+                    LinkNodes(node_temp);
             }
             else if (field == -1)
-                ConnectingNodes(temp);
-            counter++;
+                LinkNodes(node_temp);
+            column++;
         }
-        z++;
-        counter = 0;
+        i++;
+        column = 0;
     }
     fclose(fin);
 }
@@ -162,9 +171,9 @@ void Writing_bin(char *binary_file) {
     unsigned int i;
 
     /* Computing the total number of successors */
-    unsigned long ntotnsucc=0UL;
+    unsigned long ntotnsuccdim=0UL;
     for(i=0; i<nnodes; i++)
-        ntotnsucc+=nodes[i].nsucc;
+        ntotnsuccdim+=nodes[i].nsuccdim;
 
     /* Open binary file to write into */
     if((fin=fopen(binary_file,"wb")) == NULL)
@@ -172,7 +181,7 @@ void Writing_bin(char *binary_file) {
 
     /* Global data --- header */
     if( fwrite(&nnodes, sizeof(unsigned long), 1,fin) +
-        fwrite(&ntotnsucc, sizeof(unsigned long), 1,fin) !=2)
+        fwrite(&ntotnsuccdim, sizeof(unsigned long), 1,fin) !=2)
         ExitError("When initializing the output binary data file", 3);
 
     /* Writting all nodes */
@@ -180,9 +189,9 @@ void Writing_bin(char *binary_file) {
         ExitError("When writing nodes to the output binary data file", 4);
 
     /* Writting successors in blocks */
-    for (i=0; i<nnodes; i++) if(nodes[i].nsucc) {
-            if( fwrite(nodes[i].successors, sizeof(unsigned long), nodes[i].nsucc,fin) !=
-                nodes[i].nsucc)
+    for (i=0; i<nnodes; i++) if(nodes[i].nsuccdim) {
+            if( fwrite(nodes[i].successors, sizeof(unsigned long), nodes[i].nsuccdim,fin) !=
+                nodes[i].nsuccdim)
                 ExitError("When writing edges to the output binary data file", 5);
     }
     fclose(fin);
@@ -213,7 +222,7 @@ int main (int argc, char *argv[]) {
     printf("Inizializing\n");
     for(i=0; i<nnodes; i++) {
         nodes[i].id = 0;
-        nodes[i].nsucc = 0;
+        nodes[i].nsuccdim = 0;
         nodes[i].successors = malloc(sizeof(unsigned long)*1);
     }
 

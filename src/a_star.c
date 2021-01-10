@@ -7,7 +7,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-#include "utils.h"
+#include "utils.h" // ExitError, node and node_dist structs
 #include "a_star_aux.h"
 
 /*************************************************************************/

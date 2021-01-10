@@ -1,7 +1,7 @@
 # path from node_goal to node_start
-# Time elapsed by A* algorithm 8.129906s 
-# Time elapsed reading binary file 0.606605s
-# Total time elapsed 9.823352s
+# Time elapsed by A* algorithm 8.145365s 
+# Time elapsed reading binary file 0.631481s
+# Total time elapsed 9.858135s
 # Longitude, latitude node_id, distance
 37.3860989, -5.9917423,  195977239, 959868.49
 37.3861635, -5.9918119,  710632992, 959859.02
