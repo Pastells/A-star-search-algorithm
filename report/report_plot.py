@@ -23,10 +23,10 @@ def read_path(path):
 
 PATHS = []
 PATHS.append("../data/doc.kml")
-PATHS.append("optimal_path_dijkstra.csv")
-PATHS.append("optimal_path_haversine.csv")
-PATHS.append("optimal_path_spherical.csv")
-PATHS.append("optimal_path_equirectangular.csv")
+PATHS.append("../results/optimal_path_dijkstra.csv")
+PATHS.append("../results/optimal_path_haversine.csv")
+PATHS.append("../results/optimal_path_spherical.csv")
+PATHS.append("../results/optimal_path_equirectangular.csv")
 OUTPUT_FILE = "all_paths.html"
 
 colors = ["cornflowerblue", "red", "green", "purple", "orange"]

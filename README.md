@@ -16,7 +16,10 @@ Works for the csv files given in http://mat.uab.cat/~alseda/MasterOpt
     2. Spherical law of cosines
     3. Equirectangular approximation
 
-+ Visualize results with ```python ./visualization.py``` (requisite: gmplot)
++ Visualize results with ```python ./results/visualization.py``` (requisite: gmplot)
+
++ Check results folder for csv and html with resulting path and
+comparison with Google Maps
 
 By default the binary file is created as data/binary.bin,
 the path is computed to go from node 240949599 to 195977239
@@ -44,3 +47,8 @@ Contains input csv's and binary files
 ### results
 
 Contains output csv's and html's with map
+
+
+### report
+
+Pdf with report, images used in it and script to generate one fof them

@@ -41,8 +41,8 @@ int main (int argc, char *argv[]) {
     char *path_file= "results/optimal_path.csv";
 
     if (argc>1) {heuristic_number = atoi(argv[1]);}
-    if (argc>2) {node_start_id        = atoi(argv[2]);}
-    if (argc>3) {node_goal_id          = atoi(argv[3]);}
+    if (argc>2) {node_start_id    = atoi(argv[2]);}
+    if (argc>3) {node_goal_id     = atoi(argv[3]);}
     if (argc>4) {binary_file      =      argv[4];}
     if (argc>5) {path_file        =      argv[5];}
 
