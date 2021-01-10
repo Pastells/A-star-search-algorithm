@@ -64,7 +64,8 @@ void LinkNodes(char *node_temp) {
     long index;
 
     /* If node_temp is not registered, skip. Previous and next nodes will be connected */
-    if ((index = BinarySearch(atol(node_temp), nodes, nnodes) == ULONG_MAX))
+    index = BinarySearch(atol(node_temp), nodes, nnodes);
+    if (index == ULONG_MAX)
         return ;
 
     /* If *node_temp is registered, store in aux_box */

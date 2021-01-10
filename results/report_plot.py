@@ -21,23 +21,23 @@ def read_path(path):
     return latitude, longitude
 
 
-PATH = "results/optimal_path.csv"
-MAPS_PATH = "data/doc.kml"
+PATHS = []
+PATHS.append("../data/doc.kml")
+PATHS.append("optimal_path_dijkstra.csv")
+PATHS.append("optimal_path_haversine.csv")
+PATHS.append("optimal_path_spherical.csv")
+PATHS.append("optimal_path_equirectangular.csv")
+OUTPUT_FILE = "all_paths.html"
 
-# output file name
-OUTPUT_FILE = PATH[:-3] + "html"
-
-lat_maps, lon_maps = read_path(MAPS_PATH)  # data from google maps UI
-lat_sol, lon_sol = read_path(PATH)
-
+colors = ["cornflowerblue", "red", "green", "purple", "orange"]
 
 # map origin
 gmap = gmplot.GoogleMapPlotter(38.4077013, -0.5015955, 7)
 
+for i, path in enumerate(PATHS):
+    lat, lon = read_path(path)
+    gmap.plot(lat, lon, colors[i], edge_width=6)
 
-# Plot path
-gmap.plot(lat_maps, lon_maps, "cornflowerblue", edge_width=6)
-gmap.plot(lat_sol, lon_sol, "orange", edge_width=6)
 
 # Save path map
 gmap.draw(OUTPUT_FILE)

@@ -90,9 +90,8 @@ int main (int argc, char *argv[]) {
         fprintf(fp, "# Total time elapsed %fs\n",               ((double)time_total)/CLOCKS_PER_SEC);
         fprintf(fp, "# Longitude, latitude node_id, distance\n");
 
-        /* At some point we flipped longitude and latitude so I correct it here */
         for (n=0, curr=&(node_dist_var[node_goal]); curr; n++, curr=curr->parent)
-            fprintf(fp, "%2.7f, %2.7f, %10.0lu, %6.2f\n", curr->lat, curr->lon, curr->id, curr->g);
+            fprintf(fp, "%2.7f, %2.7f, %10.0lu, %6.2f\n", curr->lon, curr->lat, curr->id, curr->g);
 
         fclose(fp);
 
