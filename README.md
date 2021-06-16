@@ -36,12 +36,12 @@ a correct execution may be:
 
 Contains source codes to be compiled with compile.sh
 
-- create_binary.c reads csv file and generates binary file
+- `create_binary.c` reads csv file and generates binary file
 
-- a_star.c is the main module, calling functions from a_star_aux
+- `a_star.c` is the main module, calling functions from `a_star_aux.c`
 
-- utils.c/utils.h contain shared function for a_star.c, a_star_aux.c and
-  create_binary.c
+- `utils.c/utils.h` contain shared function for `a_star.c`, `a_star_aux.c` and
+  `create_binary.c`
 
 ### data
 
